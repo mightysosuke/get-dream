@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 import sys
 
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import chromedriver_binary  # パスを通す
 
 
@@ -37,7 +38,10 @@ def prepare(month, day):
 
 # 予約可能かどうかをチェック
 def check_date(ymd, park):
-    driver = webdriver.Chrome()
+    options = Options()
+    # options.add_argument('--headless')
+    options.add_argument("--no-sandbox")
+    driver = webdriver.Chrome(chrome_options=options)
     url = 'https://www.tokyodisneyresort.jp/ticket/sales_status/' + ymd[:6]
     driver.get(url)
 
@@ -51,7 +55,7 @@ def check_date(ymd, park):
             print('{}年{}月{}日の{}は予約が埋まっています。'.format(ymd[:4], ymd[4:6], ymd[6:8], date.get_attribute('data-park')))
             return False
     print(ymd)
-    print('指定した日付に空きがあります！３秒毎に予約画面へのアクセスを試みます。')
+    print('指定した日付に空きがあります！5秒毎に予約画面へのアクセスを試みます。')
     return True
 
 
@@ -60,7 +64,10 @@ def access_page(month, day, park):
     ymd = prepare(month, day)
 
     if check_date(ymd, park):
-        driver = webdriver.Chrome()
+        options = Options()
+        # options.add_argument('--headless')
+        options.add_argument("--no-sandbox")
+        driver = webdriver.Chrome(chrome_options=options)
         url = 'https://reserve.tokyodisneyresort.jp/ticket/search/?outside=1&route=1&useDays=1&useDateFrom=' + ymd + '&parkTicketSalesForm=1'
         '''
         エラーテスト用URL
@@ -74,7 +81,7 @@ def access_page(month, day, park):
                 driver.find_element_by_class_name('new-ui-theme')
                 flag = 1
             except:
-                sleep(3)
+                sleep(5)
                 driver.back()
                 driver.get(url)
 
